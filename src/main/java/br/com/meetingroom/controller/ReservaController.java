@@ -6,6 +6,9 @@ import br.com.meetingroom.entities.Reserva;
 import br.com.meetingroom.service.ReservaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,14 +25,11 @@ public class ReservaController {
     private final ReservaService service;
 
     @GetMapping
-    public ResponseEntity<List<ReservaResponseDTO>> buscarTodasReservas() {
-        List<Reserva> reservas = service.findAll();
-        List<ReservaResponseDTO> response = reservas.stream()
-                .map(ReservaResponseDTO::new)
-                .toList();
-
+    public ResponseEntity<Page<ReservaResponseDTO>> buscarTodasReservas(
+            @PageableDefault(size = 10, sort = "inicioReserva") Pageable pageable) {
+        Page<ReservaResponseDTO> response = service.findAll(pageable)
+                .map(ReservaResponseDTO::new);
         return ResponseEntity.ok(response);
-
     }
 
     @GetMapping("/{id}")

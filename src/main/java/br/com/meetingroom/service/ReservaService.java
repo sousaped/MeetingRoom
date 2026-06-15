@@ -11,9 +11,10 @@ import br.com.meetingroom.repository.IReservaRepository;
 import br.com.meetingroom.repository.ISalaRepository;
 import br.com.meetingroom.repository.IUsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,14 +24,13 @@ public class ReservaService {
     private final ISalaRepository salaRepository;
     private final IUsuarioRepository usuarioRepository;
 
-
-
-    public List<Reserva> findAll() {
-        //Busca todas as reservas
-        return repository.findAll();
+    @Transactional(readOnly = true) // apenas leitura, sem lock
+    public Page<Reserva> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
 
     }
 
+    @Transactional(readOnly = true) // leitura de conflito + save devem ser atômicos
     public Reserva findById(Long id) {
         //Busca a reserva por ID
         return repository.findById(id)
@@ -39,6 +39,7 @@ public class ReservaService {
 
     }
 
+    @Transactional
     public Reserva criaReserva(ReservaDTO dto) {
         // Busca sala e usuário no banco
         Sala sala = salaRepository.findById(dto.salaId())
@@ -47,7 +48,7 @@ public class ReservaService {
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
-        validaReserva(sala,dto,null);
+        validaReserva(sala, dto, null);
 
 
         Reserva reserva = new Reserva();
@@ -63,6 +64,7 @@ public class ReservaService {
 
     }
 
+    @Transactional
     public Reserva atualizaReserva(Long id, ReservaDTO dto) {
         //Verifica se existe reserva com esse id
         Reserva reserva = repository.findById(id)
@@ -74,7 +76,7 @@ public class ReservaService {
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
-        validaReserva(sala,dto,id);
+        validaReserva(sala, dto, id);
 
         //Seta o id da sala.
         reserva.setSala(sala);
@@ -93,7 +95,7 @@ public class ReservaService {
 
     }
 
-
+    @Transactional
     public void cancelaReserva(Long id) {
         //Verifica se existe reserva com esse id
         Reserva reserva = repository.findById(id)

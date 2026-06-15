@@ -46,23 +46,14 @@ public class ReservaService {
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
-        List<Reserva> reservas = repository.findByUsuarioIdAndInicioReservaAndStatusReserva(
-                dto.usuarioId(),
+        boolean temConflito = !repository.findConflitos(
+                dto.salaId(),
                 dto.inicioReserva(),
-                StatusReserva.ATIVA
-        );
+                dto.fimReserva()
+        ).isEmpty();
 
-        for (Reserva reserva : reservas) {
-            LocalDateTime reservaInicio = reserva.getInicioReserva();
-            LocalDateTime reservaFim = reservaInicio.plusMinutes(
-                    reserva.getFimReserva().getMinute()
-            );
-
-            LocalDateTime novoInicio = dto.inicioReserva();
-
-            if (novoInicio.isBefore(reservaFim) && novoInicio.isAfter(reservaInicio.minusMinutes(1))) {
-                throw new BadRequestException("Sala não está disponível. Próximo horário disponível: " + reservaFim);
-            }
+        if (temConflito) {
+            throw new BadRequestException("Sala indisponível para o período solicitado");
         }
 
 
@@ -115,10 +106,11 @@ public class ReservaService {
         Reserva reserva = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Reserva inexistente !!"));
         //Seta o Status Cancelado
+
+        reserva.cancelaReserva();
         reserva.setStatusReserva(StatusReserva.CANCELADA);
 
-        //Exclui do banco de dados a reserva
-        repository.delete(reserva);
+        repository.save(reserva);
     }
 
 

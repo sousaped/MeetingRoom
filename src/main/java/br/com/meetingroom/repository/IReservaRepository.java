@@ -1,15 +1,27 @@
 package br.com.meetingroom.repository;
 
 import br.com.meetingroom.entities.Reserva;
-import br.com.meetingroom.entities.Usuario;
-import br.com.meetingroom.enums.StatusReserva;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IReservaRepository extends JpaRepository<Reserva, Long> {
 
-    List<Reserva> findByUsuarioIdAndInicioReservaAndStatusReserva(Long usuarioId, LocalDateTime inicioReserva, StatusReserva statusReserva);
+
+    @Query("""
+                SELECT r FROM Reserva r
+                WHERE r.sala.id = :salaId
+                  AND r.statusReserva = br.com.meetingroom.enums.StatusReserva.ATIVA
+                  AND r.inicioReserva < :fim
+                  AND r.fimReserva > :inicio
+            """)
+    List<Reserva> findConflitos(
+            @Param("salaId") Long salaId,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim
+    );
 
 }

@@ -17,7 +17,7 @@ public interface IReservaRepository extends JpaRepository<Reserva, Long> {
       AND r.statusReserva = br.com.meetingroom.enums.StatusReserva.ATIVA
       AND r.inicioReserva < :fim
       AND r.fimReserva > :inicio
-      AND r.id <> :reservaId
+      AND (:reservaId IS NULL OR r.id <> :reservaId)
 """)
     List<Reserva> findConflitosExcluindoReserva(
             @Param("salaId") Long salaId,

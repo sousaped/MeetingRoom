@@ -13,7 +13,6 @@ import br.com.meetingroom.repository.IUsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,6 +22,8 @@ public class ReservaService {
     private final IReservaRepository repository;
     private final ISalaRepository salaRepository;
     private final IUsuarioRepository usuarioRepository;
+
+
 
     public List<Reserva> findAll() {
         //Busca todas as reservas
@@ -46,31 +47,7 @@ public class ReservaService {
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
-        boolean temConflito = !repository.findConflitos(
-                dto.salaId(),
-                dto.inicioReserva(),
-                dto.fimReserva()
-        ).isEmpty();
-
-        if (temConflito) {
-            throw new BadRequestException("Sala indisponível para o período solicitado");
-        }
-
-
-        // Validação de intervalo
-        if (!dto.inicioReserva().isBefore(dto.fimReserva())) {
-            throw new BadRequestException("Início deve ser anterior ao fim");
-        }
-
-        // Sala deve estar ativa
-        if (!sala.getAtivo()) {
-            throw new BadRequestException("Sala indisponível");
-        }
-
-        // Validação de capacidade
-        if (dto.qtdPessoas() > sala.getCapacidadeSala()) {
-            throw new BadRequestException("Quantidade de pessoas excede a capacidade da sala");
-        }
+        validaReserva(sala,dto,null);
 
 
         Reserva reserva = new Reserva();
@@ -91,12 +68,25 @@ public class ReservaService {
         Reserva reserva = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Reserva inexistente !!"));
 
+        // Busca sala e usuário no banco
+        Sala sala = salaRepository.findById(dto.salaId())
+                .orElseThrow(() -> new NotFoundException("Sala não encontrada"));
+        Usuario usuario = usuarioRepository.findById(dto.usuarioId())
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        validaReserva(sala,dto,id);
+
+        //Seta o id da sala.
+        reserva.setSala(sala);
         //Seta um novo valor para StatusReserva
         reserva.setStatusReserva(dto.statusReserva());
         //Seta um novo valor para o início da reserva
         reserva.setInicioReserva(dto.inicioReserva());
         //Seta um novo valor para o fim da reserva
         reserva.setFimReserva(dto.fimReserva());
+        //Seta um novo valor para a quantidade de pessoas
+        reserva.setQtdPessoas(dto.qtdPessoas());
+
 
         // Salva os dados no banco
         return repository.save(reserva);
@@ -111,6 +101,38 @@ public class ReservaService {
         //Seta o Status Cancelado
         reserva.setStatusReserva(StatusReserva.CANCELADA);
 
+        repository.save(reserva);
+    }
+
+
+    private void validaReserva(Sala sala, ReservaDTO dto, Long reservaIdIgnorar) {
+
+        // 1. inicio < fim
+        if (!dto.inicioReserva().isBefore(dto.fimReserva())) {
+            throw new BadRequestException("Início deve ser anterior ao fim");
+        }
+
+        // 2. sala ativa
+        if (!sala.getAtivo()) {
+            throw new BadRequestException("Sala indisponível");
+        }
+
+        // 3. capacidade
+        if (dto.qtdPessoas() > sala.getCapacidadeSala()) {
+            throw new BadRequestException("Quantidade de pessoas excede a capacidade da sala");
+        }
+
+        // 4. conflito
+        boolean temConflito = !repository.findConflitosExcluindoReserva(
+                dto.salaId(),
+                dto.inicioReserva(),
+                dto.fimReserva(),
+                reservaIdIgnorar
+        ).isEmpty();
+
+        if (temConflito) {
+            throw new BadRequestException("Sala indisponível para o período solicitado");
+        }
     }
 
 

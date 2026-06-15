@@ -13,5 +13,6 @@ public record ReservaDTO(
         @NotNull
         Long usuarioId,
         @NotNull
-        Long salaId) {
+        Long salaId,
+        Long reservaId) {
 }

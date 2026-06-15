@@ -12,16 +12,18 @@ public interface IReservaRepository extends JpaRepository<Reserva, Long> {
 
 
     @Query("""
-                SELECT r FROM Reserva r
-                WHERE r.sala.id = :salaId
-                  AND r.statusReserva = br.com.meetingroom.enums.StatusReserva.ATIVA
-                  AND r.inicioReserva < :fim
-                  AND r.fimReserva > :inicio
-            """)
-    List<Reserva> findConflitos(
+    SELECT r FROM Reserva r
+    WHERE r.sala.id = :salaId
+      AND r.statusReserva = br.com.meetingroom.enums.StatusReserva.ATIVA
+      AND r.inicioReserva < :fim
+      AND r.fimReserva > :inicio
+      AND r.id <> :reservaId
+""")
+    List<Reserva> findConflitosExcluindoReserva(
             @Param("salaId") Long salaId,
             @Param("inicio") LocalDateTime inicio,
-            @Param("fim") LocalDateTime fim
+            @Param("fim") LocalDateTime fim,
+            @Param("reservaId") Long reservaId
     );
 
 }

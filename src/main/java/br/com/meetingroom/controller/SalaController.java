@@ -46,7 +46,7 @@ public class SalaController {
 
     }
 
-    @PutMapping("{/id}/salas")
+    @PutMapping("/{id}")
     public ResponseEntity<SalaResponseDTO> atualizaSala(@PathVariable Long id, @RequestBody SalaDTO dto) {
         Sala sala = service.atualizaSala(id, dto);
         return ResponseEntity.ok(new SalaResponseDTO(sala));

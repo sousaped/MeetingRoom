@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 
 @RestController
-@RequestMapping("v1/reserva")
+@RequestMapping("/api/v1/reservas")
 @RequiredArgsConstructor
 @Validated
 public class ReservaController {
@@ -46,7 +46,7 @@ public class ReservaController {
         return ResponseEntity.created(uri).body(new ReservaResponseDTO(reserva));
     }
 
-    @PutMapping("/{id}/reserva")
+    @PutMapping("/{id}/reservas")
     public ResponseEntity<ReservaResponseDTO> atualizarReserva(@PathVariable Long id, @Valid @RequestBody ReservaDTO dto) {
         Reserva reserva = service.atualizaReserva(id, dto);
         return ResponseEntity.ok(new ReservaResponseDTO(reserva));

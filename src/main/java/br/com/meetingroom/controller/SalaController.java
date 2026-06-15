@@ -15,7 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 
 @RestController
-@RequestMapping("v1/sala")
+@RequestMapping("/api/v1/salas")
 @RequiredArgsConstructor
 @Validated
 public class SalaController {
@@ -46,7 +46,7 @@ public class SalaController {
 
     }
 
-    @PutMapping
+    @PutMapping("{/id}/salas")
     public ResponseEntity<SalaResponseDTO> atualizaSala(@PathVariable Long id, @RequestBody SalaDTO dto) {
         Sala sala = service.atualizaSala(id, dto);
         return ResponseEntity.ok(new SalaResponseDTO(sala));

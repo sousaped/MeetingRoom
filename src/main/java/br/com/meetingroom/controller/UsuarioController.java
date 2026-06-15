@@ -15,7 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 
 @RestController
-@RequestMapping("v1/usuario")
+@RequestMapping("/api/v1/usuarios")
 @RequiredArgsConstructor
 @Validated
 public class UsuarioController {
@@ -45,7 +45,7 @@ public class UsuarioController {
         return ResponseEntity.created(uri).body(new UsuarioResponseDTO(usuario));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/usuarios")
     public ResponseEntity<UsuarioResponseDTO> atualizarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioDTO dto) {
         Usuario usuario = service.atualizaUsuario(id, dto);
         return ResponseEntity.ok(new UsuarioResponseDTO(usuario));

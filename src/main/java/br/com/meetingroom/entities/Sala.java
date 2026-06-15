@@ -25,12 +25,13 @@ public class Sala {
     // Nome do tipo da sala
     private TipoSala tipo;
     // Capacidade da sala
+
     private Integer capacidadeSala;
     // Verifica se a sala está ativa ou não
     private Boolean ativo = true;
 
 
-    public void salaDesativada(){
+    public void salaDesativada() {
         this.ativo = false;
     }
 

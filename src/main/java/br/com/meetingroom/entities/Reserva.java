@@ -28,10 +28,11 @@ public class Reserva {
     // Quantidade de Pessoas que tem na reserva
     private Integer qtdPessoas;
 
+    // LAZY: evita carregar sala e usuario em todo findAll; carregado sob demanda
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sala_id")
     private Sala sala;
 

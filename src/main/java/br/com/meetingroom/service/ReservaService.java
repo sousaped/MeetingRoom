@@ -1,7 +1,6 @@
 package br.com.meetingroom.service;
 
 import br.com.meetingroom.dtos.ReservaDTO;
-import br.com.meetingroom.dtos.ReservaResponseDTO;
 import br.com.meetingroom.entities.Reserva;
 import br.com.meetingroom.entities.Sala;
 import br.com.meetingroom.entities.Usuario;
@@ -14,6 +13,7 @@ import br.com.meetingroom.repository.IUsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,36 +24,52 @@ public class ReservaService {
     private final ISalaRepository salaRepository;
     private final IUsuarioRepository usuarioRepository;
 
-    public List<ReservaResponseDTO> findAll() {
-        return repository.findAll()
-                .stream()
-                .map(ReservaResponseDTO::new)
-                .toList();
+    public List<Reserva> findAll() {
+        //Busca todas as reservas
+        return repository.findAll();
 
     }
 
-    public ReservaResponseDTO findById(Long id) {
+    public Reserva findById(Long id) {
+        //Busca a reserva por ID
         return repository.findById(id)
-                .map(ReservaResponseDTO::new)
                 .orElseThrow(() -> new NotFoundException("Reserva não encontrada !!"));
 
 
     }
 
-    public ReservaResponseDTO criaReserva(ReservaDTO dto) {
-
-
-        // Validação de intervalo
-        if (!dto.inicioReserva().isBefore(dto.fimReserva())) {
-            throw new BadRequestException("Início deve ser anterior ao fim");
-        }
-
+    public Reserva criaReserva(ReservaDTO dto) {
         // Busca sala e usuário no banco
         Sala sala = salaRepository.findById(dto.salaId())
                 .orElseThrow(() -> new NotFoundException("Sala não encontrada"));
 
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        List<Reserva> reservas = repository.findByUsuarioIdAndInicioReservaAndStatusReserva(
+                dto.usuarioId(),
+                dto.inicioReserva(),
+                StatusReserva.ATIVA
+        );
+
+        for (Reserva reserva : reservas) {
+            LocalDateTime reservaInicio = reserva.getInicioReserva();
+            LocalDateTime reservaFim = reservaInicio.plusMinutes(
+                    reserva.getFimReserva().getMinute()
+            );
+
+            LocalDateTime novoInicio = dto.inicioReserva();
+
+            if (novoInicio.isBefore(reservaFim) && novoInicio.isAfter(reservaInicio.minusMinutes(1))) {
+                throw new BadRequestException("Sala não está disponível. Próximo horário disponível: " + reservaFim);
+            }
+        }
+
+
+        // Validação de intervalo
+        if (!dto.inicioReserva().isBefore(dto.fimReserva())) {
+            throw new BadRequestException("Início deve ser anterior ao fim");
+        }
 
         // Sala deve estar ativa
         if (!sala.getAtivo()) {
@@ -71,12 +87,12 @@ public class ReservaService {
         reserva.setInicioReserva(dto.inicioReserva());
         reserva.setFimReserva(dto.fimReserva());
 
-        return new ReservaResponseDTO(repository.save(reserva));
+        return repository.save(reserva);
 
 
     }
 
-    public ReservaResponseDTO atualizaReserva(Long id, ReservaDTO dto) {
+    public Reserva atualizaReserva(Long id, ReservaDTO dto) {
         //Verifica se existe reserva com esse id
         Reserva reserva = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Reserva inexistente !!"));
@@ -89,7 +105,7 @@ public class ReservaService {
         reserva.setFimReserva(dto.fimReserva());
 
         // Salva os dados no banco
-        return new ReservaResponseDTO(repository.save(reserva));
+        return repository.save(reserva);
 
     }
 

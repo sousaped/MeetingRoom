@@ -10,6 +10,7 @@ public record ReservaDTO(
         LocalDateTime inicioReserva,
         LocalDateTime fimReserva,
         Integer qtdPessoas,
+        StatusReserva statusReserva,
         @NotNull
         Long usuarioId,
         @NotNull

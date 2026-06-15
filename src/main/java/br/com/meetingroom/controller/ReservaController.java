@@ -2,13 +2,14 @@ package br.com.meetingroom.controller;
 
 import br.com.meetingroom.dtos.ReservaDTO;
 import br.com.meetingroom.dtos.ReservaResponseDTO;
+import br.com.meetingroom.entities.Reserva;
 import br.com.meetingroom.service.ReservaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -21,26 +22,34 @@ public class ReservaController {
     private final ReservaService service;
 
     @GetMapping
-    public ResponseEntity<List<ReservaResponseDTO>> buscarReservas() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<ReservaResponseDTO>> buscarTodasReservas() {
+        List<Reserva> reservas = service.findAll();
+        List<ReservaResponseDTO> response = reservas.stream()
+                .map(ReservaResponseDTO::new)
+                .toList();
+
+        return ResponseEntity.ok(response);
+
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ReservaResponseDTO> buscarReservas(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id));
+        Reserva reserva = service.findById(id);
+        return ResponseEntity.ok(new ReservaResponseDTO(reserva));
 
     }
 
-    @PostMapping
-    public ResponseEntity<ReservaResponseDTO> criarReserva(@Valid @RequestBody ReservaDTO dto) {
-        ReservaResponseDTO criarReserva = service.criaReserva(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(criarReserva);
+    @PostMapping("/criar")
+    public ResponseEntity<ReservaResponseDTO> criarReserva(@RequestBody @Valid ReservaDTO dto, UriComponentsBuilder uriBuilder) {
+        var reserva = service.criaReserva(dto);
+        var uri = uriBuilder.path("/{id}").buildAndExpand(reserva.getId()).toUri();
+        return ResponseEntity.created(uri).body(new ReservaResponseDTO(reserva));
     }
 
     @PutMapping("/{id}/reserva")
     public ResponseEntity<ReservaResponseDTO> atualizarReserva(@PathVariable Long id, @Valid @RequestBody ReservaDTO dto) {
-        ReservaResponseDTO atualizaReserva = service.atualizaReserva(id, dto);
-        return ResponseEntity.ok(atualizaReserva);
+        Reserva reserva = service.atualizaReserva(id, dto);
+        return ResponseEntity.ok(new ReservaResponseDTO(reserva));
     }
 
 

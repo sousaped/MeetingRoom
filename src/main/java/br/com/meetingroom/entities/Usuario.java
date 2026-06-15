@@ -28,6 +28,9 @@ public class Usuario {
     @Column(nullable = false)
     private Boolean ativo = true;
 
+    public Usuario(Usuario usuario) {
+    }
+
 
     //Metodo para desativar o usuario
     public void usuarioInativo() {

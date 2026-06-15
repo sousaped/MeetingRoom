@@ -21,7 +21,7 @@ public class Sala {
     // Identificador unico da sala
     private Long id;
     // Nome da sala
-    private String nomeSala;
+    private String nome;
     // Nome do tipo da sala
     private TipoSala tipo;
     // Capacidade da sala

@@ -28,8 +28,6 @@ public class Reserva {
     // Quantidade de Pessoas que tem na reserva
     private Integer qtdPessoas;
 
-    private Boolean cancelaReserva;
-
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
@@ -37,9 +35,5 @@ public class Reserva {
     @JoinColumn(name = "sala_id")
     private Sala sala;
 
-    public void cancelaReserva() {
-        this.cancelaReserva = true;
-
-    }
 
 }

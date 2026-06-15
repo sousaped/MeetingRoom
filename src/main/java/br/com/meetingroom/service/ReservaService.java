@@ -74,7 +74,10 @@ public class ReservaService {
 
 
         Reserva reserva = new Reserva();
-        reserva.setStatusReserva(dto.tipo());
+        reserva.setSala(sala);
+        reserva.setUsuario(usuario);
+        reserva.setQtdPessoas(dto.qtdPessoas());
+        reserva.setStatusReserva(dto.statusReserva());
         reserva.setInicioReserva(dto.inicioReserva());
         reserva.setFimReserva(dto.fimReserva());
 
@@ -89,7 +92,7 @@ public class ReservaService {
                 .orElseThrow(() -> new NotFoundException("Reserva inexistente !!"));
 
         //Seta um novo valor para StatusReserva
-        reserva.setStatusReserva(dto.tipo());
+        reserva.setStatusReserva(dto.statusReserva());
         //Seta um novo valor para o início da reserva
         reserva.setInicioReserva(dto.inicioReserva());
         //Seta um novo valor para o fim da reserva
@@ -106,11 +109,8 @@ public class ReservaService {
         Reserva reserva = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Reserva inexistente !!"));
         //Seta o Status Cancelado
-
-        reserva.cancelaReserva();
         reserva.setStatusReserva(StatusReserva.CANCELADA);
 
-        repository.save(reserva);
     }
 
 

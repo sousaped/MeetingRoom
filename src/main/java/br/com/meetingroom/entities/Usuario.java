@@ -1,6 +1,7 @@
 package br.com.meetingroom.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,7 @@ public class Usuario {
     private String telefone;
     // Atributo para ativar o usuário ao ser criado
     @Column(nullable = false)
-    private Boolean ativo = true;
+    private boolean ativo = true;
 
     //Metodo para desativar o usuario
     public void usuarioInativo() {

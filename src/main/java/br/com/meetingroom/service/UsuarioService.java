@@ -22,9 +22,9 @@ public class UsuarioService {
 
     }
 
-    public Usuario findById(Long id) {
+    public Usuario findByEmail(String email) {
         // Busca o usuario por ID
-        return repository.findById(id)
+        return repository.findByEmail(email)
                 //Se não encontrar o usuario devolve "Usuário não encontrado"
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
@@ -35,6 +35,7 @@ public class UsuarioService {
         if (repository.findByEmail(dto.email()).isPresent()) {
             throw new BadRequestException("Este e-mail já está cadastrado");
         }
+
 
         Usuario usuario = new Usuario();
         //Ao Cadastrar o usuario deixa ele como ativo

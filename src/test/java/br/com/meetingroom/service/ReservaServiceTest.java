@@ -28,7 +28,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
-class ReservaServiceTest {
+class
+ReservaServiceTest {
     @InjectMocks
     private ReservaService service;
 

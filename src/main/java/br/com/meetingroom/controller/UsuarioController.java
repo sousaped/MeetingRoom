@@ -32,9 +32,9 @@ public class UsuarioController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
-        Usuario usuario = service.findById(id);
+    @GetMapping("/{email}")
+    public ResponseEntity<UsuarioResponseDTO> buscarPorEmail(@PathVariable String email) {
+        Usuario usuario = service.findByEmail(email);
         return ResponseEntity.ok(new UsuarioResponseDTO(usuario));
     }
 

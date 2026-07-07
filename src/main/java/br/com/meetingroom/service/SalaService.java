@@ -35,11 +35,14 @@ public class SalaService {
 
 
         Sala sala = new Sala();
-        //Nome da sala
+        //Nome da Sala
         sala.setNome(dto.nomeSala());
-
+        //Tipo da Sala
+        sala.setTipo(dto.tipo());
         //Capacidade da sala
         sala.setCapacidadeSala(dto.capacidadeSala());
+        //Deixa o status da sala como ativa
+        sala.setAtivo(true);
 
         //Salva no banco
         return repository.save(sala);
@@ -54,10 +57,13 @@ public class SalaService {
         //Troca o nome da sala
         sala.setNome(dto.nomeSala());
 
+        //Troca o tipo da Sala
+        sala.setTipo(dto.tipo());
+
         //Troca a capacidade da Sala
         sala.setCapacidadeSala(dto.capacidadeSala());
 
-        //Salva no banco
+        //Atualiza no banco
         return (repository.save(sala));
 
     }

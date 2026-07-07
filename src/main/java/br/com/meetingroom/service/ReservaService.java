@@ -115,7 +115,7 @@ public class ReservaService {
         }
 
         // 2. sala ativa
-        if (!sala.getAtivo()) {
+        if (!sala.isAtivo()) {
             throw new BadRequestException("Sala indisponível");
         }
 

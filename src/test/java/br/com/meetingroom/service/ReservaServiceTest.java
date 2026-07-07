@@ -10,6 +10,7 @@ import br.com.meetingroom.execptions.NotFoundException;
 import br.com.meetingroom.repository.IReservaRepository;
 import br.com.meetingroom.repository.ISalaRepository;
 import br.com.meetingroom.repository.IUsuarioRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,19 @@ ReservaServiceTest {
     private ISalaRepository salaRepository;
     @Mock
     private IUsuarioRepository usuarioRepository;
+
+
+    @BeforeEach
+    void setUp() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("Alex");
+        usuario.setEmail("Alex@gmail.com");
+        usuario.setTelefone("+334567890");
+        usuario.setAtivo(true);
+
+
+    }
 
 
     @Test
